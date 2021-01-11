@@ -1,11 +1,11 @@
 const express = require("express")
 const path = require("path")
-const {user} = require("D:/webstorm/User")
-const {products} = require("D:/webstorm/products")
-
+const {user} = require("./models/user")
+const {products} = require("./models/products")
+const{userRouter} = require("./routers/userRouter")
 const mongoose = require('mongoose');
 mongoose.connect("mongodb://localhost:27017/ecommercedb",
-    {useNewUrlParser: true, autoIndex: false},
+    {useNewUrlParser: true, autoIndex: false, useUnifiedTopology: true },
     (err) => {
 
         if (!err) console.log("Connection to db ...")
@@ -17,30 +17,8 @@ const app = express()
 
 app.use(express.json())
 
+app.use('/api/v1/user',userRouter)
 
-//signUp
-app.post("/api/v1/user/signup", (req, res) => {
-    const username = req.body["username"]
-    const password = req.body["password"]
-    const email = req.body["email"]
-
-
-    const newUser = {
-        username: username,
-        password: password,
-        email: email,
-    }
-
-    user.create(newUser).then(response => {
-        console.log(response)
-        res.status(201).send({
-            message: "user created"
-        })
-    }).catch(e => {
-        console.log(e.message)
-    })
-
-})
 
 //login
 app.post("/api/v1/user/login", (req, res) => {
@@ -49,7 +27,7 @@ app.post("/api/v1/user/login", (req, res) => {
 
    user.findOne({username:username,password:password}).then(response =>{
       if(response != null)
-          res.status(200).sed(response)
+          res.status(200).send(response)
               else
                   res.status(401).send({"message":"username or password are wrong"})
    })
@@ -59,9 +37,9 @@ app.post("/api/v1/user/login", (req, res) => {
 
 //add products
 app.post("/api/v1/products/addProducts", (req, res) => {
-    const name = req.add("name")
-    const price = req.add("price")
-    const brand = req.add("brand")
+    // const name = req.add("name")
+    // const price = req.add("price")
+    // const brand = req.add("brand")
 
 
 
@@ -84,7 +62,7 @@ app.post("/api/v1/products/addProducts", (req, res) => {
 
 
 //call by name & price
-app.post("/api/v1/products/callBy/name&price", (req, res) => {
+app.post("/api/v1/products/callBy/name", (req, res) => {
     const name = req.body["name"]
     const price = req.body["price"]
 
@@ -95,7 +73,6 @@ app.post("/api/v1/products/callBy/name&price", (req, res) => {
             res.status(401).send({"message":"username or password are wrong"})
     })
 })
-
 //call by brand
 app.post("/api/v1/products/callBy/brand", (req, res) => {
     const brand = req.body["brand"]
